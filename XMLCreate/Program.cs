@@ -13,29 +13,72 @@ using System.Linq;
 namespace XMLCreate {
     class Program {
         public static string fileLocation;
+        public static List<CensusRow> rows;
+        public static List<EnrollData> uniqueEIDs;
 
         [STAThread]
         static void Main(string[] args) {
             //Console.WriteLine(FilePicker());
-            fileLocation = FilePicker();
-            if (fileLocation == "ERROR")
+            fileLocation = FilePicker(); //returns path of chosen file
+            if (fileLocation == "ERROR")//check if file picker was cancelled redundant
                 Environment.Exit(0);
 
+            //read in CSV
             using (var reader = new StreamReader(fileLocation)) {
                 var csv = new CsvReader(reader);
                 csv.Configuration.HeaderValidated = null;
                 csv.Configuration.HasHeaderRecord = true;
                 csv.Configuration.RegisterClassMap<CensusRowClassMap>();
 
-                var records = csv.GetRecords<CensusRow>();
-                List<CensusRow> rows = records.ToList();
-
-                foreach(CensusRow record in rows.GroupBy(r => r.EID ).ToList()){
-                    Console.WriteLine(record.FirstName);
+                var records = csv.GetRecords<CensusRow>().ToList<CensusRow>();//load all records
+                
+                //group by EID with list of rows, no waived plans
+                var eidList = records.Where(rec => rec.CoverageDetails != "Waived" &&
+                rec.PlanType == "Medical" && DateTime.Parse(rec.PlanEffectiveEndDate) >= DateTime.Now)
+                    .GroupBy(rec => rec.EID)
+                    .Select(grouped => new {
+                        EID = grouped.Key,
+                        rows = grouped.ToList()
+                    });
+                uniqueEIDs = new List<EnrollData>();
+                //print EID and names by plan
+                foreach (var item in eidList) {
+                    Console.WriteLine(item.EID);
+                    var enrollData = new EnrollData(item.EID, item.rows);
+                    foreach(var row in item.rows) {
+                        Console.WriteLine("\t" + row.FirstName + 
+                            " " + row.LastName + "\t" + row.PlanType + 
+                            "\t" + row.PlanAdminName + "\t" + DateTime.Parse(row.PlanEffectiveEndDate));
+                    }
                 }
+
             }
+
+            
             Console.ReadLine();
         }
+
+        /// <summary>
+        /// Returns a RetirementHealthEnrollmentType which holds all transactions
+        /// and is the only body element. Acts as transaction wrapper/list
+        /// </summary>
+        /// <param name="list"> The census enrollments to convert to transactions wrapped in RetirementHealthEnrollmentType</param>
+        /// <returns>RetirementHealthEnrollmentType</returns>
+        public static RetirementHealthEnrollmentType BuildBody(List<EnrollData> list) {
+            RetirementHealthEnrollmentType retirementHealthEnrollmentType = new RetirementHealthEnrollmentType();
+            List<TransactionType> transactions = new List<TransactionType>();
+            foreach(var item in list) {
+                CensusRow emp = item.Rows.Where(row => row.RelationshipCode == "0").ToList()[0];
+                List<CensusRow> deps = item.Rows.Where(row => row.RelationshipCode != "0").ToList();
+
+                TransactionType transaction = BuildTransaction(emp, deps);
+                transactions.Add(transaction);
+            }
+
+            retirementHealthEnrollmentType.Transaction = transactions.ToArray();
+            return retirementHealthEnrollmentType;
+        } 
+
 
         public static string FilePicker(){
             string returnStr = "ERROR";
@@ -45,9 +88,9 @@ namespace XMLCreate {
                 ofd.Filter = "csv files (*.csv)| *.csv";
                 ofd.FilterIndex = 1;
 
-                if(ofd.ShowDialog() == DialogResult.OK) {
+                if (ofd.ShowDialog() == DialogResult.OK) {
                     returnStr = ofd.FileName;
-                }
+                } else Environment.Exit(-1);
             }
 
             return returnStr;

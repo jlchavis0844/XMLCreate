@@ -30,7 +30,7 @@ public class CensusRow
     public string PersonalEmail { get; set; }
     public string EmployeeType { get; set; }
     public string EmployeeStatus { get; set; }
-    public DateTime HireDate { get; set; }
+    public string HireDate { get; set; }
     public string TerminationDate { get; set; }
     public string Department { get; set; }
     public string Division { get; set; }
@@ -47,8 +47,8 @@ public class CensusRow
     public string Compensation { get; set; }
     public string CompensationType { get; set; }
     public string PayCycle { get; set; }
-    public int PayPeriods { get; set; }
-    public int CostFactor { get; set; }
+    public string PayPeriods { get; set; }
+    public string CostFactor { get; set; }
     public string TobaccoUser { get; set; }
     public string Disabled { get; set; }
     public string MedicareADate { get; set; }
@@ -62,12 +62,12 @@ public class CensusRow
     public string IPANumber { get; set; }
     public string OBGYN { get; set; }
     public string BenefitEligibleDate { get; set; }
-    public DateTime UnlockEnrollmentDate { get; set; }
+    public string UnlockEnrollmentDate { get; set; }
     public string OriginalEffectiveDateInfo { get; set; }
     public string SubscriberKey { get; set; }
     public string PlanType { get; set; }
-    public DateTime PlanEffectiveStartDate { get; set; }
-    public DateTime PlanEffectiveEndDate { get; set; }
+    public string PlanEffectiveStartDate { get; set; }
+    public string PlanEffectiveEndDate { get; set; }
     public string PlanAdminName { get; set; }
     public string PlanDisplayName { get; set; }
     public string PlanImportID { get; set; }
