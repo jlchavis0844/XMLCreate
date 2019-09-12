@@ -93,6 +93,8 @@ public class CensusRow
     public string LastModifiedDate { get; set; }
     public string LastModifiedBy { get; set; }
     public string E_SignDate { get; set; }
+    public string CalPERS_ID { get; set; }
+
     //public string EnrolledBy { get; set; }
     //public string NewBusiness { get; set; }
 }
@@ -191,6 +193,7 @@ public class CensusRowClassMap : ClassMap<CensusRow>
         Map(m => m.LastModifiedDate).Name("Last Modified Date");
         Map(m => m.LastModifiedBy).Name("Last Modified By");
         Map(m => m.E_SignDate).Name("E-Sign Date");
+        Map(m => m.CalPERS_ID).Name("CalPERS ID");
         //Map(m => m.EnrolledBy).Name("Enrolled By");
         //Map(m => m.NewBusiness).Name("New Business");
     }
