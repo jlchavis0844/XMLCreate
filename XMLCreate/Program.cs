@@ -25,8 +25,10 @@ namespace XMLCreate {
         public static List<EnrollData> uniqueEIDs;
         public static List<KeyValuePair<string, string>> transactionIds = new List<KeyValuePair<string, string>>();
         static readonly string DbConnString = @"Provider=Microsoft.ACE.OLEDB.12.0;" +
-            "Data Source='\\\\nas3\\Shared\\RALIM\\TDSGroup-Kronos\\Campbell\\Campbell.accdb';Persist Security Info=False;";
+            "Data Source='\\\\nas3\\Shared\\RALIM\\TDSGroup-Kronos\\Campbell\\Campbell.accdb';"+
+            "Persist Security Info=False;";
         public static List<CIDEntry> cidList = new List<CIDEntry>();
+        public static List<HEInfo> HEinfoList = new List<HEInfo>();
         public static List<string> Unreped = new List<string>();
 
 
@@ -55,22 +57,34 @@ namespace XMLCreate {
                         }
                     }
 
+                    //load a list of people in calpers as unrepresent 007
                     try {
-                        command = new OleDbCommand("SELECT * FROM CalPERS_ID_Unrep", conn);
+                        command = new OleDbCommand("SELECT * FROM CalPERS_HEInfo", conn);
                         using(OleDbDataReader reader = command.ExecuteReader()) {
                             Console.WriteLine("------------DATA--------------");
-                            log.Info("CalPERS_ID_Unrep data loaded");
+                            log.Info("CalPERS_HEInfo data loaded");
                             while(reader.Read()) {
-                                string tempStr = reader["CalPERS_ID"].ToString();
-                                Unreped.Add(tempStr);
-                                log.Info(tempStr);
+                                HEInfo heiTemp = new HEInfo(
+                                    reader["CalPERS_ID"].ToString(),
+                                    reader["First Name"].ToString(),
+                                    reader["Last Name"].ToString(),
+                                    reader["HEZip"].ToString(),
+                                    reader["HEType"].ToString(),
+                                    reader["Medical Group"].ToString());
+                                HEinfoList.Add(heiTemp);
+
+                                //add to the unrepped list
+                                if(heiTemp.MedicalGroup == "007 UNREPRESENTED") {
+                                    Unreped.Add(heiTemp.CalPERS_ID);
+                                }
                             }
-                            log.Info("Finished loading Unreps: " + Unreped.Count);
+                            log.Info("Finished loading CalPERS_HEInfo: " + Unreped.Count);
                         }
                     } catch(Exception e1) {
                         Console.WriteLine(e1.Message);
                         log.Error(e1.Message);
                     }
+
                 } catch(Exception e) {
                     Console.WriteLine(e.Message);
                     log.Error(e.Message);
@@ -114,7 +128,8 @@ namespace XMLCreate {
                     foreach (var row in item.rows) {
                         Console.WriteLine("\t" + row.FirstName + 
                             " " + row.LastName + "\t" + row.PlanType + 
-                            "\t" + row.PlanAdminName + "\t" + DateTime.Parse(row.PlanEffectiveEndDate).ToShortDateString());
+                            "\t" + row.PlanAdminName + "\t" + DateTime.Parse(row.PlanEffectiveEndDate)
+                            .ToShortDateString());
                     }
                 }
 
@@ -161,11 +176,6 @@ namespace XMLCreate {
         /// <param name="filePath"></param>
         /// <returns></returns>
         public static bool WriteCSVGUID(string filePath) {
-            //string filePath = FilePicker("csv");
-            //string filePath = GetSaveFile(CAMPBELLCALPERSID + "_UIDs.csv", "CSV Files | *.csv");
-            //if (filePath == "ERROR") {
-            //    Environment.Exit(-1);
-            //}
             using (var writer = new StreamWriter(filePath, false, Encoding.UTF8)) {
                 try {
                     var csv = new CsvWriter(writer);
@@ -182,7 +192,8 @@ namespace XMLCreate {
         /// Returns a RetirementHealthEnrollmentType which holds all transactions
         /// and is the only body element. Acts as transaction wrapper/list
         /// </summary>
-        /// <param name="list"> The census enrollments to convert to transactions wrapped in RetirementHealthEnrollmentType</param>
+        /// <param name="list"> The census enrollments to convert to transactions wrapped in 
+        /// RetirementHealthEnrollmentType</param>
         /// <returns>RetirementHealthEnrollmentType</returns>
         public static RetirementHealthEnrollmentType BuildBody(List<EnrollData> list) {
             RetirementHealthEnrollmentType retirementHealthEnrollmentType = new RetirementHealthEnrollmentType();
@@ -253,7 +264,6 @@ namespace XMLCreate {
             } else personInfoType.BirthDateSpecified = false;
 
             personInfoType.Gender = emp.Gender.Substring(0,1);
-
             AddressInfoType addressInfoType = new AddressInfoType();
             addressInfoType.AddressType = AddressType.PhysicalAddress;
             addressInfoType.AddressLine = new string[] { emp.Address1.Trim(), emp.Address2.Trim() };
@@ -274,7 +284,7 @@ namespace XMLCreate {
 
             EmployerInfoType employerInfoType = new EmployerInfoType();
             employerInfoType.EmployerCalPERSId = CAMPBELLCALPERSID;
-            employerInfoType.County = CountyCodes.SantaClara;
+            employerInfoType.County = CountyCodes.SantaClara;//hard coded for campbell
             transactionTypeAppointment.EmployerInfo = employerInfoType;
 
 
@@ -290,29 +300,59 @@ namespace XMLCreate {
             transactionType.Appointment = transactionTypeAppointment;
 
             TransactionTypeHealthEnrollment transactionTypeHealthEnrollment = new TransactionTypeHealthEnrollment();
-            //transactionTypeHealthEnrollment.HealthEventReason = HealthEventReasonObjects.OpenEnrollmentEmployeesNewEnrollment.CodeValue.ToString();
             transactionTypeHealthEnrollment.HealthEventReason = HEALTHEVENTREASON.CodeValue.ToString();
 
-            transactionTypeHealthEnrollment.EventDateSpecified = true;
-            transactionTypeHealthEnrollment.EventDate = DateTime.Parse(emp.EffectiveDate);
-
+            transactionTypeHealthEnrollment.EventDateSpecified = true;//Docs say turn off for OE, 
+            //ignore that. Needed
             transactionTypeHealthEnrollment.ReceivedDateSpecified = true;
             if (emp.E_SignDate != null && emp.E_SignDate != ""){
                 transactionTypeHealthEnrollment.ReceivedDate = DateTime.Parse(emp.E_SignDate);
+                transactionTypeHealthEnrollment.EventDate = DateTime.Parse(emp.E_SignDate);
             } else {
-                transactionTypeHealthEnrollment.ReceivedDate = DateTime.Parse(emp.LastModifiedDate);
+                transactionTypeHealthEnrollment.ReceivedDate = DateTime.Parse("10/3/2019");
+                transactionTypeHealthEnrollment.EventDate = DateTime.Parse("10/3/2019");
             } 
 
             SubscriberInfoType subscriberInfoType = new SubscriberInfoType();
             subscriberInfoType.ApplyChangeToMedicalPlan = true;
             subscriberInfoType.ApplyChangeToDentalPlan = false;
             subscriberInfoType.ApplyChangeToVisionPlan = false;
-            //subscriberInfoType.DomesticPartnershipIndicator = false;
 
             //hard coded as Employer zip
-            subscriberInfoType.HealthEligibilityZipCodeType = "Employer";
-            subscriberInfoType.HealthEligibilityZipCode = "95008";
-            subscriberInfoType.HealthEligibilityCounty = CountyCodes.SanFrancisco;
+            var heInfoTempList = HEinfoList.Where(e => e.CalPERS_ID == emp.CalPERS_ID).ToList();
+            if(heInfoTempList != null && heInfoTempList.Count != 0) {//if they are in list with a pervious choosen type
+                HEInfo heiTemp = heInfoTempList.First();
+                if(heiTemp.HEType == "Employer Address") {//if they choose employer
+                    subscriberInfoType.HealthEligibilityZipCodeType = HealthEligibilityZipCodeTypes.EmployerAddress;
+                    subscriberInfoType.HealthEligibilityZipCode = heiTemp.HEZip;//already set, so use it instead of hardcoding
+                    subscriberInfoType.HealthEligibilityCounty = CountyCodes.SantaClara;//all schools in same county... right...?
+                } else {//this is either physical or mailing. Doesn't matter.
+                    subscriberInfoType.HealthEligibilityZipCodeType = HealthEligibilityZipCodeTypes.PersonalAddress;
+                    subscriberInfoType.HealthEligibilityZipCode = emp.Zip;
+                    if(String.IsNullOrEmpty(emp.County)) {
+                        if(String.IsNullOrEmpty(emp.Zip)) {
+                            subscriberInfoType.HealthEligibilityCounty = CountyCodes.SantaClara;
+                        } else {
+                            subscriberInfoType.HealthEligibilityCounty = ZipAndCounties.GetCountyCode(emp.Zip);
+                        }
+                    } else {
+                        subscriberInfoType.HealthEligibilityCounty = ZipAndCounties.GetCountyCodeByName(emp.County);
+                    }
+                }
+            } else {//the have not previously choosen an eligibility type, default to personal
+                subscriberInfoType.HealthEligibilityZipCodeType = HealthEligibilityZipCodeTypes.PersonalAddress;
+                subscriberInfoType.HealthEligibilityZipCode = emp.Zip;
+                if(String.IsNullOrEmpty(emp.County)) {
+                    if(String.IsNullOrEmpty(emp.Zip)) {
+                        subscriberInfoType.HealthEligibilityCounty = CountyCodes.SantaClara;
+                    } else {
+                        subscriberInfoType.HealthEligibilityCounty = ZipAndCounties.GetCountyCode(emp.Zip);
+                    }
+                } else {
+                    subscriberInfoType.HealthEligibilityCounty = ZipAndCounties.GetCountyCodeByName(emp.County);
+                }
+                subscriberInfoType.HealthEligibilityCounty = ZipAndCounties.GetCountyCodeByName(emp.County);
+            }
             subscriberInfoType.MedicalPlanSelection = MedicalPlanCodes.Plans.Where(
                 c => c.EaseID == emp.PlanImportID).First().PlanCode;
 
@@ -326,11 +366,6 @@ namespace XMLCreate {
                 DependentPersonInfoType depInfo = new DependentPersonInfoType();
                 IdentifierType depInfoIdent = new IdentifierType();
 
-                //depInfoIdent.ItemElementName = ItemChoiceType.SSN;
-                //depInfoIdent.Item = depRow.SSN;
-                //depInfo.PersonId = depInfoIdent;
-                //depInfo.PersonIdType = IdentificationType.SocialSecurityNumber;
-
                 depInfo.FirstName = depRow.FirstName;
                 depInfo.LastName = depRow.LastName;
                 depInfo.BirthDate = DateTime.Parse(depRow.BirthDate);
@@ -342,8 +377,9 @@ namespace XMLCreate {
                 var tempCID = cidList.Where(d => d.GetDepKey() == tempDepKey).
                     ToList();
 
-                String tempCIDStr = tempCID.First().CalPERSID;
-                if(!String.IsNullOrEmpty(tempCIDStr)) {
+                
+                if(tempCID.Count == 1) {
+                    String tempCIDStr = tempCID.First().CalPERSID;
                     depInfoIdent.ItemElementName = ItemChoiceType.CalPERSId;
                     depInfoIdent.Item = tempCIDStr;
                     depInfo.PersonId = depInfoIdent;
@@ -518,7 +554,8 @@ namespace XMLCreate {
             namespaces.Add("cuns", "http://calpers.ca.gov/PSR/CommonUtilitiesV1");
             namespaces.Add("n1", "http://calpers.ca.gov/PSR/RetirementHealthTransactionsV1");
             namespaces.Add("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-            //namespaces.Add("schemaLocation", "http://calpers.ca.gov/PSR/RetirementHealthTransactionsV1 RetirementHealthTransactionsV1.xsd");
+            //namespaces.Add("schemaLocation", "http://calpers.ca.gov/PSR/RetirementHealthTransactionsV1 
+            //RetirementHealthTransactionsV1.xsd");
 
             using (XmlWriter writer = doc.CreateNavigator().AppendChild()) {
                 new XmlSerializer(o.GetType()).Serialize(writer, o, namespaces);
@@ -583,8 +620,6 @@ namespace XMLCreate {
                 //writer.Dispose();
                 Console.WriteLine(result);
             }
-
-
             return result;
         }
     }
