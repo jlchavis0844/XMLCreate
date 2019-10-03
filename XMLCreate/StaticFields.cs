@@ -2582,4 +2582,43 @@ namespace XMLCreate {
             return null;
         }
     }
+
+    public class School {
+        public readonly string Name;
+        public readonly string CalPERSID;
+
+        public School(string Name, string CalPERSID) {
+            this.Name = Name;
+            this.CalPERSID = CalPERSID;
+        }
+
+        public School(KeyValuePair<string, string> kvp) {
+            this.Name = kvp.Value;
+            this.CalPERSID = kvp.Key;
+        }
+    }
+
+    public static class Schools {
+        public static School Campbell = new School("Campbell Union HSD", "6490246026");
+        public static School MorganHill = new School("Morgan Hill USD", "7542109710");
+
+        public static Dictionary<string, string> GetSchools() {
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+            dict[Campbell.CalPERSID] = Campbell.Name;
+            dict[MorganHill.CalPERSID] = MorganHill.Name;
+            return dict;
+        }
+
+        public static string GetPath(School school) {
+            if(school.CalPERSID == Campbell.CalPERSID) {
+                return @"Provider=Microsoft.ACE.OLEDB.12.0;" +
+            "Data Source='\\\\nas3\\Shared\\RALIM\\TDSGroup-Kronos\\Campbell\\Campbell.accdb';" +
+            "Persist Security Info=False;";
+            } else {
+                return @"Provider=Microsoft.ACE.OLEDB.12.0;" +
+            "Data Source='\\\\nas3\\Shared\\RALIM\\TDSGroup-Kronos\\Morgan Hill\\MorganHill.accdb';" +
+            "Persist Security Info=False;";
+            }
+        }
+    }
 }

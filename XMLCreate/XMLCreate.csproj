@@ -78,6 +78,7 @@
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework" />
     <Reference Include="Syroot.KnownFolders, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Syroot.Windows.IO.KnownFolders.1.2.1\lib\net452\Syroot.KnownFolders.dll</HintPath>
     </Reference>
@@ -99,17 +100,11 @@
     <Compile Include="AllClasses.cs" />
     <Compile Include="CensusRow.cs" />
     <Compile Include="CIDEntry.cs" />
-    <Compile Include="EnrollmentEventReasonPicker.cs">
+    <Compile Include="GUI.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EnrollmentEventReasonPicker.Designer.cs">
-      <DependentUpon>EnrollmentEventReasonPicker.cs</DependentUpon>
-    </Compile>
-    <Compile Include="EnrollmentTypeForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EnrollmentTypeForm.Designer.cs">
-      <DependentUpon>EnrollmentTypeForm.cs</DependentUpon>
+    <Compile Include="GUI.Designer.cs">
+      <DependentUpon>GUI.cs</DependentUpon>
     </Compile>
     <Compile Include="HEInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -133,11 +128,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="EnrollmentEventReasonPicker.resx">
-      <DependentUpon>EnrollmentEventReasonPicker.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EnrollmentTypeForm.resx">
-      <DependentUpon>EnrollmentTypeForm.cs</DependentUpon>
+    <EmbeddedResource Include="GUI.resx">
+      <DependentUpon>GUI.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

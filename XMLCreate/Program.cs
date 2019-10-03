@@ -17,30 +17,36 @@ using System.Data.OleDb;
 namespace XMLCreate {
     class Program {
         public static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        public static string CAMPBELLCALPERSID = "6490246026";
+        //public static string CAMPBELLCALPERSID = "6490246026";
         public static string HEALTHEVENTTYPE2;
         public static HealthEventReasonObject HEALTHEVENTREASON;
-        public static string fileLocation;
+        //public static string fileLocation;
         public static List<CensusRow> rows;
         public static List<EnrollData> uniqueEIDs;
         public static List<KeyValuePair<string, string>> transactionIds = new List<KeyValuePair<string, string>>();
-        static readonly string DbConnString = @"Provider=Microsoft.ACE.OLEDB.12.0;" +
-            "Data Source='\\\\nas3\\Shared\\RALIM\\TDSGroup-Kronos\\Campbell\\Campbell.accdb';"+
-            "Persist Security Info=False;";
         public static List<CIDEntry> cidList = new List<CIDEntry>();
         public static List<HEInfo> HEinfoList = new List<HEInfo>();
         public static List<string> Unreped = new List<string>();
-
+        public static GUI gui = new GUI();
+        public static School school;
 
         [STAThread]
         static void Main(string[] args) {
+            gui.ShowDialog();
+        }
+
+        public static bool ConnectToDB() {
             log.Info("Connecting to Access DB...");
-            using(OleDbConnection conn = new OleDbConnection(DbConnString)) {
+            gui.UpdateStatus( "Connecting to Access DB...");
+            Cursor.Current = Cursors.WaitCursor;
+
+            string connStr = Schools.GetPath(school);
+            using(OleDbConnection conn = new OleDbConnection(connStr)) {
                 OleDbCommand command = new OleDbCommand("SELECT * FROM CalPERS_ID_Dep", conn);
+                log.Info("Conn String: " + connStr);
 
                 try {
                     conn.Open();
-                    log.Info("Connected to DB");
                     using(OleDbDataReader reader = command.ExecuteReader()) {
                         Console.WriteLine("------------DATA--------------");
                         log.Info("CalPERS_ID_Dep data loaded");
@@ -83,21 +89,32 @@ namespace XMLCreate {
                     } catch(Exception e1) {
                         Console.WriteLine(e1.Message);
                         log.Error(e1.Message);
+                        return false;
                     }
 
                 } catch(Exception e) {
                     Console.WriteLine(e.Message);
                     log.Error(e.Message);
+                    return false;
                 }
             }
+            log.Info("Connected to DB");
+            gui.UpdateStatus("Connected to Access DB! Load File Next");
+            Cursor.Current = Cursors.Default;
+            return true;
+        }
 
-            log.Info("Starting file loading at " + DateTime.Now);
-            //Console.WriteLine(FilePicker());
-            fileLocation = FilePicker("csv"); //returns path of chosen file
-            if (fileLocation == "ERROR")//check if file picker was cancelled redundant
-                Environment.Exit(0);
+        [STAThread]
+        public static XDocument Run(string fileLocation) {
+
+            //log.Info("Starting file loading at " + DateTime.Now);
+            ////Console.WriteLine(FilePicker());
+            //fileLocation = FilePicker("csv"); //returns path of chosen file
+            //if (fileLocation == "ERROR")//check if file picker was cancelled redundant
+            //    Environment.Exit(0);
 
 
+            XDocument xdoc;
             uniqueEIDs = new List<EnrollData>();
             //read in CSV
             using (var reader = new StreamReader(fileLocation)) {
@@ -133,11 +150,19 @@ namespace XMLCreate {
                     }
                 }
 
+                //TransactionType transactionType = new TransactionType();
+
+                //EnrollmentTypeForm form = new EnrollmentTypeForm();
+                //form.ShowDialog();
+                ////transactionType.TransactionType1 = HEALTHEVENTTYPE2;
+                //EnrollmentEventReasonPicker form2 = new EnrollmentEventReasonPicker();
+                //form2.ShowDialog();
+
                 Envelope envelope = new Envelope();
                 HeaderInfoType headerInfoType = new HeaderInfoType();
                 Header header = new Header();
                 headerInfoType.InterfaceTypeId = 50031;
-                headerInfoType.BusinessPartnerId = CAMPBELLCALPERSID;
+                headerInfoType.BusinessPartnerId = school.CalPERSID;
                 headerInfoType.SchemaVersion = 1.0M;
                 headerInfoType.DateTime = DateTime.Now;
                 headerInfoType.ContactEmail = "TDSep@TDSGroup.org";
@@ -157,17 +182,13 @@ namespace XMLCreate {
 
                 //doc.Save(FilePicker("xml"));
                 string defName = DateTime.Now.ToString("yyyyMMddHHmmss_fff_") + "50031";
-                XDocument xdoc = XDocument.Parse(doc.OuterXml);
+                xdoc = XDocument.Parse(doc.OuterXml);
                 xdoc.Descendants().Where(e => string.IsNullOrEmpty(e.Value)).Remove();
-                //xdoc.Save(GetSaveFile(CAMPBELLCALPERSID + "_XDoc.xml", "XML File | *.xml"));
-                //doc.Save(GetSaveFile(CAMPBELLCALPERSID + ".xml", "XML File | *.xml"));
-                //xdoc.Save(GetSaveFile(defName + "_xdoc.xml", "XML File | *.xml"));
-                doc.Save(GetSaveFile(defName + ".xml", "XML File | *.xml"));
-
-                WriteCSVGUID(GetSaveFile(defName + "_UIDs.csv", "CSV File | *.csv"));
-                //prettyPrintXML(doc.InnerXml);
+                //doc.Save(GetSaveFile(defName + ".xml", "XML File | *.xml"));
+                //WriteCSVGUID(GetSaveFile(defName + "_UIDs.csv", "CSV File | *.csv"));
             }
             //end main
+            return xdoc;
         }
 
         /// <summary>
@@ -219,19 +240,13 @@ namespace XMLCreate {
         /// <param name="deps">List of CensusRows that hold dependent data</param>
         /// <returns></returns>
         public static TransactionType BuildTransaction(CensusRow emp, List<CensusRow> deps) {
+
             TransactionType transactionType = new TransactionType();
-
-            EnrollmentTypeForm form = new EnrollmentTypeForm();
-            form.ShowDialog();
             transactionType.TransactionType1 = HEALTHEVENTTYPE2;
-            EnrollmentEventReasonPicker form2 = new EnrollmentEventReasonPicker();
-            form2.ShowDialog();
-
 
             Guid guid = Guid.NewGuid();
             transactionIds.Add(new KeyValuePair<string, string>(emp.EID, guid.ToString()));
             transactionType.UniqueTransactionId = guid.ToString();
-
             transactionType.RescindIndicator = false;
             transactionType.RescindIndicatorSpecified = true;
 
@@ -283,7 +298,7 @@ namespace XMLCreate {
             TransactionTypeAppointment transactionTypeAppointment = new TransactionTypeAppointment();
 
             EmployerInfoType employerInfoType = new EmployerInfoType();
-            employerInfoType.EmployerCalPERSId = CAMPBELLCALPERSID;
+            employerInfoType.EmployerCalPERSId = school.CalPERSID;
             employerInfoType.County = CountyCodes.SantaClara;//hard coded for campbell
             transactionTypeAppointment.EmployerInfo = employerInfoType;
 
