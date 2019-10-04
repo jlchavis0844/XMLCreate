@@ -88,6 +88,11 @@ namespace XMLCreate {
         }
 
         private void BtnProcess_Click(object sender, EventArgs e) {
+            if(string.IsNullOrEmpty(lblInput.Text) || lblInput.Text == "Waiting for file") {
+                btnProcess.Enabled = false;
+                return;
+            }
+
             XDocument doc = Program.Run(lblInput.Text);
             tbPreview.Text = doc.ToString();
         }

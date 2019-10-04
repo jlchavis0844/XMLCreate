@@ -32,7 +32,8 @@ namespace XMLCreate {
 
         [STAThread]
         static void Main(string[] args) {
-            gui.ShowDialog();
+            new MedicalPlanCodeForm().ShowDialog();
+            //gui.ShowDialog();
         }
 
         public static bool ConnectToDB() {
@@ -89,12 +90,14 @@ namespace XMLCreate {
                     } catch(Exception e1) {
                         Console.WriteLine(e1.Message);
                         log.Error(e1.Message);
+                        gui.UpdateStatus(e1.Message);
                         return false;
                     }
 
                 } catch(Exception e) {
                     Console.WriteLine(e.Message);
                     log.Error(e.Message);
+                    gui.UpdateStatus(e.Message);
                     return false;
                 }
             }
@@ -366,7 +369,7 @@ namespace XMLCreate {
                 } else {
                     subscriberInfoType.HealthEligibilityCounty = ZipAndCounties.GetCountyCodeByName(emp.County);
                 }
-                subscriberInfoType.HealthEligibilityCounty = ZipAndCounties.GetCountyCodeByName(emp.County);
+                //subscriberInfoType.HealthEligibilityCounty = ZipAndCounties.GetCountyCodeByName(emp.County);
             }
             subscriberInfoType.MedicalPlanSelection = MedicalPlanCodes.Plans.Where(
                 c => c.EaseID == emp.PlanImportID).First().PlanCode;

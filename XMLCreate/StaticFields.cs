@@ -717,11 +717,22 @@ namespace XMLCreate {
         public string EaseID;
         public string LongName;
         public string PlanCode;
+        public School SchoolObject;
 
         public MedicalPlanInfo(string EaseID, string LongName, string PlanCode) {
             this.EaseID = EaseID;
             this.LongName = LongName;
             this.PlanCode = PlanCode;
+            if(Program.school != null) {
+                SchoolObject = Program.school;
+            }
+        }
+
+        public MedicalPlanInfo(string EaseID, string LongName, string PlanCode, School school) {
+            this.EaseID = EaseID;
+            this.LongName = LongName;
+            this.PlanCode = PlanCode;
+            this.SchoolObject = school;
         }
     }
 

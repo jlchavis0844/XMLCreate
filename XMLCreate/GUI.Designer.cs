@@ -27,17 +27,17 @@
             this.lblSchool = new System.Windows.Forms.Label();
             this.btnConnect = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.lblSubReason = new System.Windows.Forms.Label();
+            this.cbSubEnroll = new System.Windows.Forms.ComboBox();
+            this.cbEnrollReason = new System.Windows.Forms.Label();
+            this.cbEnroll = new System.Windows.Forms.ComboBox();
+            this.btnProcess = new System.Windows.Forms.Button();
+            this.tbPreview = new System.Windows.Forms.TextBox();
+            this.lblInput = new System.Windows.Forms.Label();
+            this.btnLoadInput = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ssInfo = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
-            this.btnLoadInput = new System.Windows.Forms.Button();
-            this.lblInput = new System.Windows.Forms.Label();
-            this.tbPreview = new System.Windows.Forms.TextBox();
-            this.btnProcess = new System.Windows.Forms.Button();
-            this.cbEnroll = new System.Windows.Forms.ComboBox();
-            this.cbEnrollReason = new System.Windows.Forms.Label();
-            this.lblSubReason = new System.Windows.Forms.Label();
-            this.cbSubEnroll = new System.Windows.Forms.ComboBox();
             this.panel1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
@@ -92,6 +92,88 @@
             this.panel1.Size = new System.Drawing.Size(950, 833);
             this.panel1.TabIndex = 3;
             // 
+            // lblSubReason
+            // 
+            this.lblSubReason.AutoSize = true;
+            this.lblSubReason.Location = new System.Drawing.Point(8, 118);
+            this.lblSubReason.Name = "lblSubReason";
+            this.lblSubReason.Size = new System.Drawing.Size(66, 13);
+            this.lblSubReason.TabIndex = 10;
+            this.lblSubReason.Text = "Sub Reason";
+            // 
+            // cbSubEnroll
+            // 
+            this.cbSubEnroll.FormattingEnabled = true;
+            this.cbSubEnroll.Location = new System.Drawing.Point(113, 114);
+            this.cbSubEnroll.Name = "cbSubEnroll";
+            this.cbSubEnroll.Size = new System.Drawing.Size(235, 21);
+            this.cbSubEnroll.TabIndex = 9;
+            this.cbSubEnroll.SelectedIndexChanged += new System.EventHandler(this.CbSubEnroll_SelectedIndexChanged);
+            // 
+            // cbEnrollReason
+            // 
+            this.cbEnrollReason.AutoSize = true;
+            this.cbEnrollReason.Location = new System.Drawing.Point(8, 79);
+            this.cbEnrollReason.Name = "cbEnrollReason";
+            this.cbEnrollReason.Size = new System.Drawing.Size(93, 13);
+            this.cbEnrollReason.TabIndex = 8;
+            this.cbEnrollReason.Text = "Enollment Reason";
+            // 
+            // cbEnroll
+            // 
+            this.cbEnroll.FormattingEnabled = true;
+            this.cbEnroll.Location = new System.Drawing.Point(113, 75);
+            this.cbEnroll.Name = "cbEnroll";
+            this.cbEnroll.Size = new System.Drawing.Size(235, 21);
+            this.cbEnroll.TabIndex = 7;
+            this.cbEnroll.SelectedIndexChanged += new System.EventHandler(this.CbEnroll_SelectedIndexChanged);
+            // 
+            // btnProcess
+            // 
+            this.btnProcess.Enabled = false;
+            this.btnProcess.Location = new System.Drawing.Point(11, 154);
+            this.btnProcess.Name = "btnProcess";
+            this.btnProcess.Size = new System.Drawing.Size(115, 23);
+            this.btnProcess.TabIndex = 6;
+            this.btnProcess.Text = "Process File";
+            this.btnProcess.UseVisualStyleBackColor = true;
+            this.btnProcess.Click += new System.EventHandler(this.BtnProcess_Click);
+            // 
+            // tbPreview
+            // 
+            this.tbPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbPreview.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.tbPreview.Location = new System.Drawing.Point(11, 183);
+            this.tbPreview.Multiline = true;
+            this.tbPreview.Name = "tbPreview";
+            this.tbPreview.ReadOnly = true;
+            this.tbPreview.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tbPreview.Size = new System.Drawing.Size(928, 647);
+            this.tbPreview.TabIndex = 5;
+            this.tbPreview.TextChanged += new System.EventHandler(this.TbPreview_TextChanged);
+            // 
+            // lblInput
+            // 
+            this.lblInput.AutoSize = true;
+            this.lblInput.Location = new System.Drawing.Point(8, 47);
+            this.lblInput.Name = "lblInput";
+            this.lblInput.Size = new System.Drawing.Size(74, 13);
+            this.lblInput.TabIndex = 4;
+            this.lblInput.Text = "Waiting for file";
+            // 
+            // btnLoadInput
+            // 
+            this.btnLoadInput.Enabled = false;
+            this.btnLoadInput.Location = new System.Drawing.Point(374, 42);
+            this.btnLoadInput.Name = "btnLoadInput";
+            this.btnLoadInput.Size = new System.Drawing.Size(115, 23);
+            this.btnLoadInput.TabIndex = 3;
+            this.btnLoadInput.Text = "Load Input File";
+            this.btnLoadInput.UseVisualStyleBackColor = true;
+            this.btnLoadInput.Click += new System.EventHandler(this.BtnLoadInput_Click);
+            // 
             // statusStrip1
             // 
             this.statusStrip1.Dock = System.Windows.Forms.DockStyle.None;
@@ -133,87 +215,6 @@
             this.toolStripContainer1.TabIndex = 5;
             this.toolStripContainer1.Text = "toolStripContainer1";
             this.toolStripContainer1.TopToolStripPanelVisible = false;
-            // 
-            // btnLoadInput
-            // 
-            this.btnLoadInput.Enabled = false;
-            this.btnLoadInput.Location = new System.Drawing.Point(374, 42);
-            this.btnLoadInput.Name = "btnLoadInput";
-            this.btnLoadInput.Size = new System.Drawing.Size(115, 23);
-            this.btnLoadInput.TabIndex = 3;
-            this.btnLoadInput.Text = "Load Input File";
-            this.btnLoadInput.UseVisualStyleBackColor = true;
-            this.btnLoadInput.Click += new System.EventHandler(this.BtnLoadInput_Click);
-            // 
-            // lblInput
-            // 
-            this.lblInput.AutoSize = true;
-            this.lblInput.Location = new System.Drawing.Point(8, 47);
-            this.lblInput.Name = "lblInput";
-            this.lblInput.Size = new System.Drawing.Size(74, 13);
-            this.lblInput.TabIndex = 4;
-            this.lblInput.Text = "Waiting for file";
-            // 
-            // tbPreview
-            // 
-            this.tbPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbPreview.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbPreview.Location = new System.Drawing.Point(11, 183);
-            this.tbPreview.Multiline = true;
-            this.tbPreview.Name = "tbPreview";
-            this.tbPreview.ReadOnly = true;
-            this.tbPreview.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbPreview.Size = new System.Drawing.Size(928, 647);
-            this.tbPreview.TabIndex = 5;
-            this.tbPreview.TextChanged += new System.EventHandler(this.TbPreview_TextChanged);
-            // 
-            // btnProcess
-            // 
-            this.btnProcess.Location = new System.Drawing.Point(11, 154);
-            this.btnProcess.Name = "btnProcess";
-            this.btnProcess.Size = new System.Drawing.Size(115, 23);
-            this.btnProcess.TabIndex = 6;
-            this.btnProcess.Text = "Process File";
-            this.btnProcess.UseVisualStyleBackColor = true;
-            this.btnProcess.Click += new System.EventHandler(this.BtnProcess_Click);
-            // 
-            // cbEnroll
-            // 
-            this.cbEnroll.FormattingEnabled = true;
-            this.cbEnroll.Location = new System.Drawing.Point(113, 75);
-            this.cbEnroll.Name = "cbEnroll";
-            this.cbEnroll.Size = new System.Drawing.Size(235, 21);
-            this.cbEnroll.TabIndex = 7;
-            this.cbEnroll.SelectedIndexChanged += new System.EventHandler(this.CbEnroll_SelectedIndexChanged);
-            // 
-            // cbEnrollReason
-            // 
-            this.cbEnrollReason.AutoSize = true;
-            this.cbEnrollReason.Location = new System.Drawing.Point(8, 79);
-            this.cbEnrollReason.Name = "cbEnrollReason";
-            this.cbEnrollReason.Size = new System.Drawing.Size(93, 13);
-            this.cbEnrollReason.TabIndex = 8;
-            this.cbEnrollReason.Text = "Enollment Reason";
-            // 
-            // lblSubReason
-            // 
-            this.lblSubReason.AutoSize = true;
-            this.lblSubReason.Location = new System.Drawing.Point(8, 118);
-            this.lblSubReason.Name = "lblSubReason";
-            this.lblSubReason.Size = new System.Drawing.Size(66, 13);
-            this.lblSubReason.TabIndex = 10;
-            this.lblSubReason.Text = "Sub Reason";
-            // 
-            // cbSubEnroll
-            // 
-            this.cbSubEnroll.FormattingEnabled = true;
-            this.cbSubEnroll.Location = new System.Drawing.Point(113, 114);
-            this.cbSubEnroll.Name = "cbSubEnroll";
-            this.cbSubEnroll.Size = new System.Drawing.Size(235, 21);
-            this.cbSubEnroll.TabIndex = 9;
-            this.cbSubEnroll.SelectedIndexChanged += new System.EventHandler(this.CbSubEnroll_SelectedIndexChanged);
             // 
             // GUI
             // 
