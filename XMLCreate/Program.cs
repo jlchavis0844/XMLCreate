@@ -13,6 +13,7 @@ using log4net;
 using System.Reflection;
 using System.Xml.Linq;
 using System.Data.OleDb;
+using System.Data;
 
 namespace XMLCreate {
     class Program {
@@ -29,11 +30,13 @@ namespace XMLCreate {
         public static List<string> Unreped = new List<string>();
         public static GUI gui = new GUI();
         public static School school;
+        public static DataTable MedPlans;
 
         [STAThread]
         static void Main(string[] args) {
-            new MedicalPlanCodeForm().ShowDialog();
-            //gui.ShowDialog();
+            LoadMedPlans();
+            //new MedicalPlanCodeForm().ShowDialog();
+            gui.ShowDialog();
         }
 
         public static bool ConnectToDB() {
@@ -371,8 +374,17 @@ namespace XMLCreate {
                 }
                 //subscriberInfoType.HealthEligibilityCounty = ZipAndCounties.GetCountyCodeByName(emp.County);
             }
-            subscriberInfoType.MedicalPlanSelection = MedicalPlanCodes.Plans.Where(
-                c => c.EaseID == emp.PlanImportID).First().PlanCode;
+
+            try {
+                subscriberInfoType.MedicalPlanSelection = MedicalPlanCodes.Plans.Where(
+                    c => c.EaseID == emp.PlanImportID).First().PlanCode;
+
+            } catch(InvalidOperationException ioe) {
+                log.Error(ioe.Message);
+                gui.UpdateStatus("Unmatched Medical Plan for " + emp.PlanImportID);
+                transactionType = null;
+                return transactionType;
+            }
 
             transactionTypeHealthEnrollment.SubscriberInfo = subscriberInfoType;
             transactionType.HealthEnrollment = transactionTypeHealthEnrollment;
@@ -589,6 +601,9 @@ namespace XMLCreate {
         /// <returns></returns>
         public static XmlDocument SerializeToXmlDocument(object o) {
             XmlDocument doc = new XmlDocument();
+            if(o == null) {
+                return doc;
+            }
             XPathNavigator nav = doc.CreateNavigator();
             XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
             namespaces.Add("soap", "http://schemas.xmlsoap.org/soap/envelope/");
@@ -639,6 +654,23 @@ namespace XMLCreate {
                 Console.WriteLine(result);
             }
             return result;
+        }
+
+        public static void LoadMedPlans() {
+            var here = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, @"..\..\..\CalPERSPlanData.csv"));
+            using(var reader = new StreamReader(here)) {
+                using(var csv = new CsvReader(reader)) {
+                    csv.Configuration.HeaderValidated = null;
+                    csv.Configuration.HasHeaderRecord = true;
+
+                    using(var dr = new CsvDataReader(csv)) {
+                        MedPlans = new DataTable();
+                        MedPlans.Load(dr);
+                        //dgvMedPlans.DataSource = dt;
+                        //dgvMedPlans.Refresh();
+                    }
+                }
+            }
         }
     }
 }

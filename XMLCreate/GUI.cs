@@ -1,8 +1,10 @@
 ﻿using Syroot.Windows.IO;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using System.Linq;
 
 namespace XMLCreate {
     public partial class GUI : Form {
@@ -92,7 +94,19 @@ namespace XMLCreate {
                 btnProcess.Enabled = false;
                 return;
             }
+            var test = Program.MedPlans.Rows;
+            List<MedicalPlanInfo> plans = new List<MedicalPlanInfo>();
+            var loadedPlans = from DataRow row in Program.MedPlans.Rows.Cast<DataRow>()
+                where (string)row[4] == Program.school.CalPERSID
+                select row;
 
+            foreach(var row in loadedPlans) {
+                plans.Add(new MedicalPlanInfo(
+                    row[0].ToString(), 
+                    row[1].ToString(),
+                    row[2].ToString()));
+            }
+            MedicalPlanCodes.Plans = plans;
             XDocument doc = Program.Run(lblInput.Text);
             tbPreview.Text = doc.ToString();
         }
@@ -121,6 +135,10 @@ namespace XMLCreate {
 
         private void TbPreview_TextChanged(object sender, EventArgs e) {
 
+        }
+
+        private void BtnMedPlans_Click(object sender, EventArgs e) {
+            new MedicalPlanCodeForm().ShowDialog();
         }
     }
 }

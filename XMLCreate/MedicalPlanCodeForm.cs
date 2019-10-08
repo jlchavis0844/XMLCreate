@@ -17,20 +17,46 @@ namespace XMLCreate {
         }
 
         private void MedicalPlanCodeForm_Load(object sender, EventArgs e) {
-            var here = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, @"..\..\..\CalPERSPlanData.csv"));
-            using(var reader = new StreamReader(here)) {
-                using(var csv = new CsvReader(reader)) {
-                    csv.Configuration.HeaderValidated = null;
-                    csv.Configuration.HasHeaderRecord = true;
 
-                    using(var dr = new CsvDataReader(csv)) {
-                        var dt = new DataTable();
-                        dt.Load(dr);
-                        dgvMedPlans.DataSource = dt;
-                        dgvMedPlans.Refresh();
+            foreach(DataColumn col in Program.MedPlans.Columns) {
+                col.ReadOnly = false;
+            }
+
+            dgvMedPlans.DataSource = Program.MedPlans;
+            dgvMedPlans.Refresh();
+        }
+
+        private void BtnMedCancel_Click(object sender, EventArgs e) {
+            this.Close();
+        }
+
+        private void BtnMedOK_Click(object sender, EventArgs e) {
+            string filePath = Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, @"..\..\..\CalPERSPlanData.csv"));
+            DataTable dataTable = (DataTable)dgvMedPlans.DataSource;
+            using(var writer = new StreamWriter(filePath, false, Encoding.UTF8)) {
+                try {
+                    using(var csvWriter = new CsvWriter(writer)) {
+
+                        foreach(DataColumn column in dataTable.Columns) {
+                            csvWriter.WriteField(column.ColumnName);
+                        }
+
+                        csvWriter.NextRecord();
+
+                        foreach(DataRow row in dataTable.Rows) {
+                            for(var i = 0; i < dataTable.Columns.Count; i++) {
+                                csvWriter.WriteField(row[i]);
+                            }
+                            csvWriter.NextRecord();
+                        }
                     }
+                    Program.MedPlans = dataTable;
+                } catch(Exception e2) {
+                    Console.WriteLine(e2);
+                    Program.log.Error(e2.Message);
                 }
             }
+            this.Close();
         }
     }
 }

@@ -736,23 +736,25 @@ namespace XMLCreate {
         }
     }
 
-    static class MedicalPlanData {
-        public static readonly MedicalPlanInfo AnthemSelectHMO = new MedicalPlanInfo("28LWB6", "Anthem Select HMO", "506");
-        public static readonly MedicalPlanInfo AnthemTraditionalHMO = new MedicalPlanInfo("GCENUV", "Anthem Traditional HMO", "509");
-        public static readonly MedicalPlanInfo BlueShieldAccessPlus = new MedicalPlanInfo("WGJYAA", "Blue Shield Access +", "525");
-        public static readonly MedicalPlanInfo HealthNetSmartCare = new MedicalPlanInfo("KZCU9J", "HealthNet SmartCare", "528");
-        public static readonly MedicalPlanInfo Kaiser = new MedicalPlanInfo("8NBVRF", "Kaiser", "533");
-        public static readonly MedicalPlanInfo PERSCare = new MedicalPlanInfo("XTQYCJ", "PERSCare", "566");
-        public static readonly MedicalPlanInfo PERSChoice = new MedicalPlanInfo("BDEPAH", "PERS Choice", "548");
-        public static readonly MedicalPlanInfo PERSSelect = new MedicalPlanInfo("ZP5VED", "PERS Select", "557");
-    }
+    //static class MedicalPlanData {
+    //    public static readonly MedicalPlanInfo AnthemSelectHMO = new MedicalPlanInfo("28LWB6", "Anthem Select HMO", "506");
+    //    public static readonly MedicalPlanInfo AnthemTraditionalHMO = new MedicalPlanInfo("GCENUV", "Anthem Traditional HMO", "509");
+    //    public static readonly MedicalPlanInfo BlueShieldAccessPlus = new MedicalPlanInfo("WGJYAA", "Blue Shield Access +", "525");
+    //    public static readonly MedicalPlanInfo HealthNetSmartCare = new MedicalPlanInfo("KZCU9J", "HealthNet SmartCare", "528");
+    //    public static readonly MedicalPlanInfo Kaiser = new MedicalPlanInfo("8NBVRF", "Kaiser", "533");
+    //    public static readonly MedicalPlanInfo PERSCare = new MedicalPlanInfo("XTQYCJ", "PERSCare", "566");
+    //    public static readonly MedicalPlanInfo PERSChoice = new MedicalPlanInfo("BDEPAH", "PERS Choice", "548");
+    //    public static readonly MedicalPlanInfo PERSSelect = new MedicalPlanInfo("ZP5VED", "PERS Select", "557");
+    //}
 
     static class MedicalPlanCodes {
-        public static readonly List<MedicalPlanInfo> Plans = new List<MedicalPlanInfo>(){
-            MedicalPlanData.AnthemSelectHMO, MedicalPlanData.AnthemTraditionalHMO, MedicalPlanData.BlueShieldAccessPlus,
-            MedicalPlanData.HealthNetSmartCare, MedicalPlanData.Kaiser, MedicalPlanData.PERSCare,
-            MedicalPlanData.PERSChoice, MedicalPlanData.PERSSelect
-        };
+        //public static readonly List<MedicalPlanInfo> Plans = new List<MedicalPlanInfo>(){
+        //    MedicalPlanData.AnthemSelectHMO, MedicalPlanData.AnthemTraditionalHMO, MedicalPlanData.BlueShieldAccessPlus,
+        //    MedicalPlanData.HealthNetSmartCare, MedicalPlanData.Kaiser, MedicalPlanData.PERSCare,
+        //    MedicalPlanData.PERSChoice, MedicalPlanData.PERSSelect
+        //};
+
+        public static List<MedicalPlanInfo> Plans { get; set; }
     }
 
     public class CollectiveBargainingUnit {

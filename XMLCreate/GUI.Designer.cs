@@ -38,6 +38,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ssInfo = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
+            this.btnMedPlans = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
@@ -76,6 +77,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.btnMedPlans);
             this.panel1.Controls.Add(this.lblSubReason);
             this.panel1.Controls.Add(this.cbSubEnroll);
             this.panel1.Controls.Add(this.cbEnrollReason);
@@ -216,6 +218,16 @@
             this.toolStripContainer1.Text = "toolStripContainer1";
             this.toolStripContainer1.TopToolStripPanelVisible = false;
             // 
+            // btnMedPlans
+            // 
+            this.btnMedPlans.Location = new System.Drawing.Point(183, 154);
+            this.btnMedPlans.Name = "btnMedPlans";
+            this.btnMedPlans.Size = new System.Drawing.Size(165, 23);
+            this.btnMedPlans.TabIndex = 11;
+            this.btnMedPlans.Text = "View/Edit Medical Plans";
+            this.btnMedPlans.UseVisualStyleBackColor = true;
+            this.btnMedPlans.Click += new System.EventHandler(this.BtnMedPlans_Click);
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -255,5 +267,6 @@
         private System.Windows.Forms.ComboBox cbEnroll;
         private System.Windows.Forms.Label lblSubReason;
         private System.Windows.Forms.ComboBox cbSubEnroll;
+        private System.Windows.Forms.Button btnMedPlans;
     }
 }
